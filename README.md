@@ -1,2 +1,2 @@
 # propi-5
-Analog modeling synthesizer using Mozzi
+Analog modeling synthesizer with Mozzi running on RP2040
