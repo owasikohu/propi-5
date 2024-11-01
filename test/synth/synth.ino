@@ -21,13 +21,15 @@
 
 #include <Mozzi.h>
 #include <Oscil.h> // oscillator template
-#include <tables/sin2048_int8.h> // sine table for oscillator
+#include <tables/saw4096_int8.h>
+#include <tables/triangle4096_int8.h>
 
 // use: Oscil <table_size, update_rate> oscilName (wavetable), look in .h file of table #included above
-Oscil <SIN2048_NUM_CELLS, MOZZI_AUDIO_RATE> aSin(SIN2048_DATA);
+Oscil <4096, MOZZI_AUDIO_RATE> osc1(SAW4096_DATA);
+Oscil <4096, MOZZI_AUDIO_RATE> osc2(SAW4096_DATA);
 
 // control variable, use the smallest data size you can for anything used in audio
-byte gain = 255;
+
 
 
 void setup(){
@@ -54,18 +56,18 @@ void setup(){
   int lfo_depth
   */
   startMozzi(); // start with default control rate of 64
-  aSin.setFreq(3320); // set the frequency
+  osc1.setFreq(440); // set the frequency
 }
 
 
 void updateControl(){
   // as byte, this will automatically roll around to 255 when it passes 0
-  gain = gain - 3 ;
+  
 }
 
 
 AudioOutput updateAudio(){
-  return MonoOutput::from16Bit(aSin.next() * gain); // 8 bits waveform * 8 bits gain makes 16 bits
+  return MonoOutput::from16Bit(osc1.next() * 8);
 }
 
 
