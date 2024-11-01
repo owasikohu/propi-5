@@ -19,26 +19,30 @@
     Mozzi is licensed under the GNU Lesser General Public Licence (LGPL) Version 2.1 or later.
 */
 
+#include <Arduino.h>
+#include <Adafruit_TinyUSB.h>
 #include <Mozzi.h>
 #include <Oscil.h> 
+#include <tables/saw4096_int8.h>
 
-// Oscil <4096, MOZZI_AUDIO_RATE> osc1(SAW4096_DATA);
+Oscil <4096, MOZZI_AUDIO_RATE> osc1(SAW4096_DATA);
 
 void setup(){
-
+   Serial.begin(115200);
 
   startMozzi(); // start with default control rate of 64
-  // osc1.setFreq(440); // set the frequency
+  osc1.setFreq(440); // set the frequency
 }
 
 
 void updateControl(){
-  
+  int pw = map(mozziAnalogRead16(A0), 0, 65535, 0, 255); //補正
+  Serial.println(pw);
 }
 
 
 AudioOutput updateAudio(){
-  // return MonoOutput::from16Bit(osc1.next() * 8);
+  return MonoOutput::from16Bit(osc1.next() * 8);
 }
 
 
