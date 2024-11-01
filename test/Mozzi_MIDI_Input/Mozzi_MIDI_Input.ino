@@ -20,66 +20,77 @@
 
    Mozzi is licensed under the GNU Lesser General Public Licence (LGPL) Version 2.1 or later.
 */
-
+#include <Arduino.h>
+#include <Adafruit_TinyUSB.h>
 #include <MIDI.h>
 // use #define for MOZZI_CONTROL_RATE, not a constant
 #define MOZZI_CONTROL_RATE 128 // Hz, powers of 2 are most reliable
 #include <Mozzi.h>
-#include <Oscil.h> // oscillator template
-#include <tables/sin2048_int8.h> // sine table for oscillator
-#include <mozzi_midi.h>
-#include <ADSR.h>
+#include <Oscil.h>
+#include <tables/sin2048_int8.h>
 
+Oscil <2048, MOZZI_AUDIO_RATE> aSin(SIN2048_DATA);
 
-MIDI_CREATE_DEFAULT_INSTANCE();
+// USB MIDI object
+Adafruit_USBD_MIDI usb_midi;
 
-// audio sinewave oscillator
-Oscil <SIN2048_NUM_CELLS, MOZZI_AUDIO_RATE> aSin(SIN2048_DATA);
+// Create a new instance of the Arduino MIDI Library
+MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 
-// envelope generator
-ADSR <MOZZI_CONTROL_RATE, MOZZI_AUDIO_RATE> envelope;
-
-#define LED 13 // shows if MIDI is being recieved
-
-void HandleNoteOn(byte channel, byte note, byte velocity) {
-  aSin.setFreq(mtof(float(note)));
-  envelope.noteOn();
-  digitalWrite(LED,HIGH);
-}
-
-void HandleNoteOff(byte channel, byte note, byte velocity) {
-  envelope.noteOff();
-  digitalWrite(LED,LOW);
-}
 
 void setup() {
-  pinMode(LED, OUTPUT);
+    // Initialize USB
+  if (!TinyUSBDevice.isInitialized()) {
+    TinyUSBDevice.begin(0);
+  }
 
-  // Connect the HandleNoteOn function to the library, so it is called upon reception of a NoteOn.
-  MIDI.setHandleNoteOn(HandleNoteOn);  // Put only the name of the function
-  MIDI.setHandleNoteOff(HandleNoteOff);  // Put only the name of the function
-  // Initiate MIDI communications, listen to all channels (not needed with Teensy usbMIDI)
+  Serial.begin(115200);
+
+  // Initialize MIDI
   MIDI.begin(MIDI_CHANNEL_OMNI);
 
-  envelope.setADLevels(255,64);
-  envelope.setTimes(50,200,10000,200); // 10000 is so the note will sustain 10 seconds unless a noteOff comes
+  // Allow interrupts for MIDI
+  MIDI.setHandleNoteOn(handleNoteOn);
+  MIDI.setHandleNoteOff(handleNoteOff);
 
-  aSin.setFreq(440); // default frequency
+  aSin.setFreq(440);
   startMozzi();
 }
 
 
 void updateControl(){
+  TinyUSBDevice.task();
   MIDI.read();
-  envelope.update();
 }
 
 
 AudioOutput updateAudio(){
-  return MonoOutput::from16Bit(envelope.next() * aSin.next());
+  return MonoOutput::from16Bit(aSin.next());
 }
 
 
 void loop() {
   audioHook(); // required here
+}
+
+void handleNoteOn(byte channel, byte pitch, byte velocity) {
+  // Log when a note is played
+  Serial.print("Note On: ");
+  Serial.print("Channel = ");
+  Serial.print(channel);
+  Serial.print(", Pitch = ");
+  Serial.print(pitch);
+  Serial.print(", Velocity = ");
+  Serial.println(velocity);
+}
+
+void handleNoteOff(byte channel, byte pitch, byte velocity) {
+  // Log when a note is released
+  Serial.print("Note Off: ");
+  Serial.print("Channel = ");
+  Serial.print(channel);
+  Serial.print(", Pitch = ");
+  Serial.print(pitch);
+  Serial.print(", Velocity = ");
+  Serial.println(velocity);
 }
