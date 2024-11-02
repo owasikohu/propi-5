@@ -36,7 +36,7 @@ void setup(){
 
 
 void updateControl(){
-  int pw = map(mozziAnalogRead16(A0), 0, 65535, 0, 255); //補正
+  int pw = map(mozziAnalogRead16(A0), 0, 65535, 0, 255); 
   Serial.println(pw);
 }
 

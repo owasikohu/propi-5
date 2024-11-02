@@ -21,24 +21,32 @@
 
 #include <Mozzi.h>
 #include <Oscil.h> // oscillator template
-#include <tables/saw4096_int8.h>
-#include <tables/triangle4096_int8.h>
+#include <tables/smoothsquare8192_int8.h>
+#include <tables/saw8192_int8.h>
+#include <tables/triangle_warm8192_int8.h>
+#include <tables/whitenoise8192_int8.h>
+
+#define CONTROL_RATE 128
+
+#define NUM_VOICES 4
 
 // use: Oscil <table_size, update_rate> oscilName (wavetable), look in .h file of table #included above
-Oscil <4096, MOZZI_AUDIO_RATE> osc1(SAW4096_DATA);
-Oscil <4096, MOZZI_AUDIO_RATE> osc2(SAW4096_DATA);
+Oscil <8192, MOZZI_AUDIO_RATE> osc1;
+Oscil <8192, MOZZI_AUDIO_RATE> osc2;
 
 // control variable, use the smallest data size you can for anything used in audio
 
 
 
 void setup(){
-  /*
+  0-255
+    /*
   int osc1_wave =
-  int osc1_pw =
+  int osc1_pitch =
 
   int osc2_wave =
   int osc2_pitch =
+  int osc2_detune = 
 
   int mix_osc1_vol =
   int mix_osc2_vol =

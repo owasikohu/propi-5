@@ -24,7 +24,6 @@
 #include <Adafruit_TinyUSB.h>
 #include <MIDI.h>
 // use #define for MOZZI_CONTROL_RATE, not a constant
-#define MOZZI_CONTROL_RATE 128 // Hz, powers of 2 are most reliable
 #include <Mozzi.h>
 #include <Oscil.h>
 #include <tables/sin2048_int8.h>

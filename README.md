@@ -4,6 +4,6 @@ Analog modeling synthesizer with Mozzi running on RP2040
 
 シンセサイザーの実装
 
-つまみからのアナログ値読み取りの自動補正
+つまみからのアナログ値読み取りの補正
 
 ハードウェア
